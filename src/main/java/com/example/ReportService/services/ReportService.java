@@ -730,6 +730,7 @@ public class ReportService implements IReportService {
         } else if (border.equals("Top")) {
             cellStyle.setBorderTop(BorderStyle.THICK);
         }
+        row.getCell(num - 1).setCellStyle(cellStyle);
     }
 
 
