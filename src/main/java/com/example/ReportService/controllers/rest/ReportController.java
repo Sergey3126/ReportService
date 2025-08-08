@@ -67,7 +67,7 @@ public class ReportController {
      *
      * @return статус
      */
-    @RequestMapping(value = {"/{uuid}/export", "/{uuid}/export/"}, method = RequestMethod.HEAD)
+    @RequestMapping(value = {"account/{uuid}/export", "account/{uuid}/export/"}, method = RequestMethod.HEAD)
     public ResponseEntity<Void> statusReport(@PathVariable UUID uuid) {
         return reportService.statusReport(uuid);
     }

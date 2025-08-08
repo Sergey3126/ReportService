@@ -95,6 +95,7 @@ public class ReportService implements IReportService {
             throw new ValidationException(MessageError.EMPTY_LINE);
         }
 
+
         try {
             //создает DtCreate, DtUpdate, Uuid, AccountUuid и сохраняет Status и Type
             reportRaw.setUuid(UUID.randomUUID());
@@ -216,7 +217,7 @@ public class ReportService implements IReportService {
         int sum;
         int total = 0;
         String currency;
-        int rowInt = 3;
+        int rowInt = 0;
         String title = "";
         String exportDirectory = "";
         String type = "";
@@ -286,14 +287,12 @@ public class ReportService implements IReportService {
                     balance = (Map<UUID, Integer>) objectStream.readObject();
                     objectStream.close();
 
-
-                    numCols = 3;
                     //создание оформления
-                    createTitle(sheet, numCols, workbook, "Балансы счетов", thickBorderStyleCenter);
                     createAndSetCell(workbook, headerRow, 0, "Счета", IndexedColors.WHITE, thickBorderStyleCenter);
                     createAndSetCell(workbook, headerRow, 1, "Тип счета", IndexedColors.WHITE, thickBorderStyleCenter);
                     createAndSetCell(workbook, headerRow, 2, "Сумма", IndexedColors.WHITE, thickBorderStyleCenter);
-
+                    numCols = headerRow.getLastCellNum();
+                    createTitle(sheet, numCols, workbook, "Балансы счетов", thickBorderStyleCenter);
                     //создание строк с названием счета, балансом, и типом счета
                     for (int i = 0; i < accountEntityList.size(); i++) {
                         UUID uuidAccount = accountEntityList.get(i).getAccount();
@@ -337,7 +336,7 @@ public class ReportService implements IReportService {
                     operationMap = (Map<UUID, List<Operation>>) objectStream.readObject();
                     objectStream.close();
 
-                    numCols = 6;
+
                     if (report.getType() == Type.BY_DATE) {
                         title = "Операции счетов относительно даты";
                     } else if (report.getType() == Type.BY_CATEGORY) {
@@ -346,14 +345,15 @@ public class ReportService implements IReportService {
 
 
                     //создание оформления
-                    createTitle(sheet, numCols, workbook, title, thickBorderStyleCenter);
+
                     createAndSetCell(workbook, headerRow, 0, "Счета", IndexedColors.WHITE, thickBorderStyleCenter);
                     createAndSetCell(workbook, headerRow, 1, "Тип счета", IndexedColors.WHITE, thickBorderStyleCenter);
                     createAndSetCell(workbook, headerRow, 2, "Описание операции", IndexedColors.WHITE, thickBorderStyleCenter);
                     createAndSetCell(workbook, headerRow, 3, "Категория трат", IndexedColors.WHITE, thickBorderStyleCenter);
                     createAndSetCell(workbook, headerRow, 4, "Дата операции", IndexedColors.WHITE, thickBorderStyleCenter);
                     createAndSetCell(workbook, headerRow, 5, "Сумма", IndexedColors.WHITE, thickBorderStyleCenter);
-
+                    numCols = headerRow.getLastCellNum();
+                    createTitle(sheet, numCols, workbook, title, thickBorderStyleCenter);
                     row = sheet.createRow(rowInt);
 //заполнение данными имя счета, тип счета, описание операции, категория трат, дата операции, сумма операции
                     for (int i = 0; i < accountEntityList.size(); i++) {
