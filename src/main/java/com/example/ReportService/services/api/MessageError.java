@@ -26,4 +26,5 @@ public final class MessageError {
     public static final String REPORT_STATUS = "Результат недоступен: ";
 
     public static final String UUID_OPERATION = "Переданная Operation отсутствует в списке доступных";
+
 }

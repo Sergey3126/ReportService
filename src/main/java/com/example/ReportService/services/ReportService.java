@@ -104,6 +104,8 @@ public class ReportService implements IReportService {
             reportRaw.setStatus(Status.LOADED);
             reportRaw.setType(Type.valueOf(type));
 
+            checkAccessibility(accountUrl, paramsRaw.getAccounts());
+
             //сохраняет переданные счета
             for (int i = 0; i < paramsRaw.getAccounts().size(); i++) {
                 //создает ReportUuid, Account, Uuid и сохраняет
@@ -134,6 +136,9 @@ public class ReportService implements IReportService {
                         throw new ValidationException(MessageError.EMPTY_LINE);
                     }
                     Category category = new Category();
+
+                    checkAccessibility(categoryUrl, paramsRaw.getCategory());
+
                     //создает ReportUuid, Category, Uuid и сохраняет
                     for (int i = 0; i < paramsRaw.getCategory().size(); i++) {
                         category.setUuid(UUID.randomUUID());
@@ -217,7 +222,7 @@ public class ReportService implements IReportService {
         int sum;
         int total = 0;
         String currency;
-        int rowInt = 0;
+        int rowInt = 3;
         String title = "";
         String exportDirectory = "";
         String type = "";
@@ -733,5 +738,17 @@ public class ReportService implements IReportService {
         row.getCell(num - 1).setCellStyle(cellStyle);
     }
 
+    //проверят доступность
+    private void checkAccessibility(String url, List<UUID> uuidList) {
+        for (int i = 0; i < uuidList.size(); i++) {
+            try (InputStream stream = new URL(url + uuidList.get(i).toString()).openStream()) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
+                String str = reader.lines().collect(Collectors.joining("\n"));
+            } catch (IOException e) {
 
+                throw new ValidationException(MessageError.INCORRECT_UUID);
+
+            }
+        }
+    }
 }
