@@ -9,7 +9,9 @@ import java.util.UUID;
 
 @Repository
 public interface IReportStorage extends JpaRepository<ReportEntity, UUID> {
-    List<ReportEntity> findAll();
+
+
+    List<ReportEntity> findByNick(String nick);
 
     List<ReportEntity> findByStatus(String status);
 }

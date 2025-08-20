@@ -17,11 +17,13 @@ public final class MessageError {
 
     public static final String INCORRECT_UUID = "Неверный uuid";
 
-    public static final String UUID_ACCOUNT ="Переданный Account отсутствует в списке доступных";
+    public static final String INCORRECT_TOKEN = "Неверный token";
+
+    public static final String UUID_ACCOUNT = "Переданный Account отсутствует в списке доступных";
 
     public static final String EMPTY_LINE = "Пустая строка";
 
-    public static final String UUID_REPORT ="Переданный Report отсутствует в списке доступных";
+    public static final String UUID_REPORT = "Переданный Report отсутствует в списке доступных";
 
     public static final String REPORT_STATUS = "Результат недоступен: ";
 

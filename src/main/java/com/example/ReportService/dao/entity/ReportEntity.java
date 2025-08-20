@@ -20,6 +20,21 @@ public class ReportEntity {
     private String type;
     private LocalDateTime fromDate;
     private LocalDateTime toDate;
+    private String nick;
+
+
+    public ReportEntity(UUID uuid, LocalDateTime dtCreate, LocalDateTime dtUpdate, String status, String description, String type, LocalDateTime fromDate, LocalDateTime toDate, String nick) {
+        this.uuid = uuid;
+        this.dtCreate = dtCreate;
+        this.dtUpdate = dtUpdate;
+        this.status = status;
+        this.description = description;
+        this.type = type;
+        this.fromDate = fromDate;
+        this.toDate = toDate;
+        this.nick = nick;
+
+    }
 
     public UUID getUuid() {
         return uuid;
@@ -85,29 +100,28 @@ public class ReportEntity {
         this.toDate = toDate;
     }
 
+    public String getNick() {
+        return nick;
+    }
+
+    public void setNick(String nick) {
+        this.nick = nick;
+    }
+
+
     @Override
     public String toString() {
         return "ReportEntity{" +
                 "uuid=" + uuid +
                 ", dtCreate=" + dtCreate +
                 ", dtUpdate=" + dtUpdate +
-                ", status=" + status +
+                ", status='" + status + '\'' +
                 ", description='" + description + '\'' +
-                ", type=" + type +
-                ", from=" + fromDate +
-                ", to=" + toDate +
+                ", type='" + type + '\'' +
+                ", fromDate=" + fromDate +
+                ", toDate=" + toDate +
+                ", nick='" + nick + '\'' +
                 '}';
-    }
-
-    public ReportEntity(UUID uuid, LocalDateTime dtCreate, LocalDateTime dtUpdate, String status, String description, String type, LocalDateTime from, LocalDateTime to) {
-        this.uuid = uuid;
-        this.dtCreate = dtCreate;
-        this.dtUpdate = dtUpdate;
-        this.status = status;
-        this.description = description;
-        this.type = type;
-        this.fromDate = from;
-        this.toDate = to;
     }
 
     public ReportEntity() {

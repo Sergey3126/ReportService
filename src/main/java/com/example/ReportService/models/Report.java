@@ -16,6 +16,33 @@ public class Report {
     private Type type;
     private LocalDateTime fromDate;
     private LocalDateTime toDate;
+    private String nick;
+
+
+    @Override
+    public String toString() {
+        return "Report{" +
+                "uuid=" + uuid +
+                ", dtCreate=" + dtCreate +
+                ", dtUpdate=" + dtUpdate +
+                ", status=" + status +
+                ", description='" + description + '\'' +
+                ", type=" + type +
+                ", fromDate=" + fromDate +
+                ", toDate=" + toDate +
+                ", nick='" + nick + '\'' +
+
+                '}';
+    }
+
+    public String getNick() {
+        return nick;
+    }
+
+    public void setNick(String nick) {
+        this.nick = nick;
+    }
+
 
     public UUID getUuid() {
         return uuid;
@@ -81,29 +108,17 @@ public class Report {
         this.toDate = toDate;
     }
 
-    @Override
-    public String toString() {
-        return "Report{" +
-                "uuid=" + uuid +
-                ", dtCreate=" + dtCreate +
-                ", dtUpdate=" + dtUpdate +
-                ", status=" + status +
-                ", description='" + description + '\'' +
-                ", type=" + type +
-                ", from=" + fromDate +
-                ", to=" + toDate +
-                '}';
-    }
-
-    public Report(UUID uuid, LocalDateTime dtCreate, LocalDateTime dtUpdate, Status status, String description, Type type, LocalDateTime from, LocalDateTime to) {
+    public Report(UUID uuid, LocalDateTime dtUpdate, LocalDateTime dtCreate, Status status, String description, Type type, LocalDateTime fromDate, LocalDateTime toDate, String nick) {
         this.uuid = uuid;
-        this.dtCreate = dtCreate;
         this.dtUpdate = dtUpdate;
+        this.dtCreate = dtCreate;
         this.status = status;
         this.description = description;
         this.type = type;
-        this.fromDate = from;
-        this.toDate = to;
+        this.fromDate = fromDate;
+        this.toDate = toDate;
+        this.nick = nick;
+
     }
 
     public Report() {

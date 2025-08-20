@@ -9,6 +9,9 @@ public class Params {
     private List<UUID> category;
     private LocalDateTime from;
     private LocalDateTime to;
+    private String nick;
+    private String key;
+
 
     public List<UUID> getAccounts() {
         return accounts;
@@ -45,18 +48,38 @@ public class Params {
     @Override
     public String toString() {
         return "Params{" +
-                "account=" + accounts +
+                "accounts=" + accounts +
                 ", category=" + category +
                 ", from=" + from +
                 ", to=" + to +
+                ", nick='" + nick + '\'' +
+                ", key='" + key + '\'' +
                 '}';
     }
 
-    public Params(List<UUID> category, List<UUID> account, LocalDateTime from, LocalDateTime to) {
+    public Params(List<UUID> category, List<UUID> accounts, LocalDateTime to, LocalDateTime from, String key, String nick) {
         this.category = category;
-        this.accounts = account;
-        this.from = from;
+        this.accounts = accounts;
         this.to = to;
+        this.from = from;
+        this.key = key;
+        this.nick = nick;
+    }
+
+    public String getNick() {
+        return nick;
+    }
+
+    public void setNick(String nick) {
+        this.nick = nick;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public Params() {

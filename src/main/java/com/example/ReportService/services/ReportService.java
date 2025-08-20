@@ -28,12 +28,10 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 
 import java.io.*;
@@ -62,6 +60,7 @@ public class ReportService implements IReportService {
     private LocalDateTime localDateTime = LocalDateTime.now();
     private ObjectMapper objectMapper = new ObjectMapper();
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+    private RestTemplate restTemplate = new RestTemplate();
 
 
     public ReportService(IResultStorage resultStorage, IReportStorage reportStorage, IAccountStorage accountStorage, ICategoryStorage categoryStorage, ConversionService conversionService) {
@@ -72,6 +71,9 @@ public class ReportService implements IReportService {
         this.conversionService = conversionService;
     }
 
+    //ссылка для доступа к шифровке
+    @Value("${encryption_url}")
+    private String encryptionUrl;
     //ссылка для доступа к категории
     @Value("${operation_category_url}")
     private String categoryUrl;
@@ -90,11 +92,15 @@ public class ReportService implements IReportService {
         Report reportRaw = new Report();
         Accounts account = new Accounts();
 
+        User user = new User();
+        user.setKey(paramsRaw.getKey());
+        user.setNick(paramsRaw.getNick());
+        checkKey(user);
+
         // Проверяем, что обязательное поле не пусто
         if (paramsRaw.getAccounts() == null) {
             throw new ValidationException(MessageError.EMPTY_LINE);
         }
-
 
         try {
             //создает DtCreate, DtUpdate, Uuid, AccountUuid и сохраняет Status и Type
@@ -163,7 +169,9 @@ public class ReportService implements IReportService {
     }
 
     @Override
-    public PageImpl<Report> getReport(int page, int size) {
+    public PageImpl<Report> getReport(int page, int size, User user) {
+
+        checkKey(user);
         // Проверка на положительность значений(что больше 0 и не равен 0)
         if (page <= 0) {
             throw new ValidationException(MessageError.PAGE_NUMBER);
@@ -176,7 +184,7 @@ public class ReportService implements IReportService {
         int end;
         Pageable pageable;
         try {
-            List<ReportEntity> reportEntityList = reportStorage.findAll();
+            List<ReportEntity> reportEntityList = reportStorage.findByNick(user.getNick());
             pageable = Pageable.ofSize(size).withPage(page - 1);
             // Конвертация ReportEntity в Report и добавление в список
             for (int i = 0; i < reportEntityList.size(); i++) {
@@ -203,8 +211,19 @@ public class ReportService implements IReportService {
 
 
     @Override
-    public ResponseEntity<ByteArrayResource> exportReport(UUID uuid) {
-        Report report = conversionService.convert(reportStorage.findById(uuid).orElse(null), Report.class);
+    public ResponseEntity<ByteArrayResource> exportReport(UUID uuid, User user) {
+        checkKey(user);
+
+        //поиск нужного отчета
+        ReportEntity reportEntity = new ReportEntity();
+        List<ReportEntity> operationEntityList = reportStorage.findByNick(user.getNick());
+        for (int i = 0; i < operationEntityList.size(); i++) {
+            reportEntity = operationEntityList.get(i);
+            if (reportEntity.getUuid() == uuid) {
+                break;
+            }
+        }
+        Report report = conversionService.convert(reportEntity, Report.class);
         Map<UUID, Integer> balance = new HashMap<>();
         Map<UUID, List<Operation>> operationMap = new HashMap<>();
         List<Operation> operationList = new ArrayList<>();
@@ -484,8 +503,17 @@ public class ReportService implements IReportService {
 
 
     @Override
-    public ResponseEntity<Void> statusReport(UUID uuid) {
-        ReportEntity reportEntity = reportStorage.findById(uuid).orElse(null);
+    public ResponseEntity<Void> statusReport(UUID uuid, User user) {
+        checkKey(user);
+        //поиск нужного отчета
+        ReportEntity reportEntity = new ReportEntity();
+        List<ReportEntity> operationEntityList = reportStorage.findByNick(user.getNick());
+        for (int i = 0; i < operationEntityList.size(); i++) {
+            reportEntity = operationEntityList.get(i);
+            if (reportEntity.getUuid() == uuid) {
+                break;
+            }
+        }
         if (reportEntity == null) {
             throw new ValidationException(MessageError.UUID_REPORT);
         }
@@ -749,6 +777,29 @@ public class ReportService implements IReportService {
                 throw new ValidationException(MessageError.INCORRECT_UUID);
 
             }
+        }
+    }
+
+    //проверка авторизации
+    private void checkKey(User user) {
+        // Проверяем, что обязательные поля не пусты
+        if (user.getNick() == null || user.getKey() == null) {
+            throw new ValidationException(MessageError.EMPTY_LINE);
+        }
+        try {
+            //получаем совпадает ли токен
+            String jsonUser = objectMapper.writeValueAsString(user);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<String> str = new HttpEntity<>(jsonUser, headers);
+            ResponseEntity<Boolean> response = restTemplate.postForEntity(encryptionUrl + "check", str, boolean.class);
+            boolean bool = response.getBody();
+
+            if (!bool) {
+                throw new ValidationException(MessageError.INCORRECT_TOKEN);
+            }
+        } catch (IOException e) {
+            throw new ValidationException(MessageError.INCORRECT_UUID);
         }
     }
 }

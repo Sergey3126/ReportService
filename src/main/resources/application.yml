@@ -17,5 +17,6 @@ account_url: http://localhost:8080/api/v1/account/
 operation_category_url: http://localhost:8081/api/v1/classifier/operation/category/
 operation_url: http://localhost:8080/api/v1/account/
 currency_url: http://localhost:8081/api/v1/classifier/currency/
+encryption_url: http://localhost:8084/api/v1/encryption/
 server:
   port: 8082

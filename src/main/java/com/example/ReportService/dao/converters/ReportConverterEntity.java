@@ -9,19 +9,18 @@ public class ReportConverterEntity implements Converter<Report, ReportEntity> {
 
     @Override
     public ReportEntity convert(Report source) {
-
-
         ReportEntity reportEntity = new ReportEntity();
 
         reportEntity.setUuid(source.getUuid());
         reportEntity.setDtCreate(source.getDtCreate());
         reportEntity.setDtUpdate(source.getDtUpdate());
         reportEntity.setDescription(source.getDescription());
-
         reportEntity.setStatus(String.valueOf(source.getStatus()));
         reportEntity.setType(String.valueOf(source.getType()));
         reportEntity.setToDate(source.getToDate());
         reportEntity.setFromDate(source.getFromDate());
+
+        reportEntity.setNick(source.getNick());
         return reportEntity;
     }
 
