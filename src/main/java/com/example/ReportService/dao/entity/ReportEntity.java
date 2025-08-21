@@ -21,9 +21,34 @@ public class ReportEntity {
     private LocalDateTime fromDate;
     private LocalDateTime toDate;
     private String nick;
+private  String key;
 
 
-    public ReportEntity(UUID uuid, LocalDateTime dtCreate, LocalDateTime dtUpdate, String status, String description, String type, LocalDateTime fromDate, LocalDateTime toDate, String nick) {
+    @Override
+    public String toString() {
+        return "ReportEntity{" +
+                "uuid=" + uuid +
+                ", dtCreate=" + dtCreate +
+                ", dtUpdate=" + dtUpdate +
+                ", status='" + status + '\'' +
+                ", description='" + description + '\'' +
+                ", type='" + type + '\'' +
+                ", fromDate=" + fromDate +
+                ", toDate=" + toDate +
+                ", nick='" + nick + '\'' +
+                ", key='" + key + '\'' +
+                '}';
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public ReportEntity(UUID uuid, LocalDateTime dtCreate, LocalDateTime dtUpdate, String status, String description, String type, LocalDateTime fromDate, LocalDateTime toDate, String nick, String key) {
         this.uuid = uuid;
         this.dtCreate = dtCreate;
         this.dtUpdate = dtUpdate;
@@ -34,6 +59,7 @@ public class ReportEntity {
         this.toDate = toDate;
         this.nick = nick;
 
+        this.key = key;
     }
 
     public UUID getUuid() {
@@ -108,21 +134,6 @@ public class ReportEntity {
         this.nick = nick;
     }
 
-
-    @Override
-    public String toString() {
-        return "ReportEntity{" +
-                "uuid=" + uuid +
-                ", dtCreate=" + dtCreate +
-                ", dtUpdate=" + dtUpdate +
-                ", status='" + status + '\'' +
-                ", description='" + description + '\'' +
-                ", type='" + type + '\'' +
-                ", fromDate=" + fromDate +
-                ", toDate=" + toDate +
-                ", nick='" + nick + '\'' +
-                '}';
-    }
 
     public ReportEntity() {
     }

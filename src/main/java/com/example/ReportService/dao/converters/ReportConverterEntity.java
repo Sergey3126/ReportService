@@ -19,7 +19,7 @@ public class ReportConverterEntity implements Converter<Report, ReportEntity> {
         reportEntity.setType(String.valueOf(source.getType()));
         reportEntity.setToDate(source.getToDate());
         reportEntity.setFromDate(source.getFromDate());
-
+reportEntity.setKey(source.getKey());
         reportEntity.setNick(source.getNick());
         return reportEntity;
     }

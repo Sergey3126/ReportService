@@ -17,23 +17,7 @@ public class Report {
     private LocalDateTime fromDate;
     private LocalDateTime toDate;
     private String nick;
-
-
-    @Override
-    public String toString() {
-        return "Report{" +
-                "uuid=" + uuid +
-                ", dtCreate=" + dtCreate +
-                ", dtUpdate=" + dtUpdate +
-                ", status=" + status +
-                ", description='" + description + '\'' +
-                ", type=" + type +
-                ", fromDate=" + fromDate +
-                ", toDate=" + toDate +
-                ", nick='" + nick + '\'' +
-
-                '}';
-    }
+private  String key;
 
     public String getNick() {
         return nick;
@@ -108,7 +92,31 @@ public class Report {
         this.toDate = toDate;
     }
 
-    public Report(UUID uuid, LocalDateTime dtUpdate, LocalDateTime dtCreate, Status status, String description, Type type, LocalDateTime fromDate, LocalDateTime toDate, String nick) {
+    @Override
+    public String toString() {
+        return "Report{" +
+                "uuid=" + uuid +
+                ", dtCreate=" + dtCreate +
+                ", dtUpdate=" + dtUpdate +
+                ", status=" + status +
+                ", description='" + description + '\'' +
+                ", type=" + type +
+                ", fromDate=" + fromDate +
+                ", toDate=" + toDate +
+                ", nick='" + nick + '\'' +
+                ", key='" + key + '\'' +
+                '}';
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public Report(UUID uuid, LocalDateTime dtUpdate, LocalDateTime dtCreate, Status status, String description, Type type, LocalDateTime fromDate, LocalDateTime toDate, String nick, String key) {
         this.uuid = uuid;
         this.dtUpdate = dtUpdate;
         this.dtCreate = dtCreate;
@@ -119,6 +127,7 @@ public class Report {
         this.toDate = toDate;
         this.nick = nick;
 
+        this.key = key;
     }
 
     public Report() {

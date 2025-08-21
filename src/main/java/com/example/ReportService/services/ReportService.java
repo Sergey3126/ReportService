@@ -109,8 +109,9 @@ public class ReportService implements IReportService {
             reportRaw.setDtUpdate(localDateTime);
             reportRaw.setStatus(Status.LOADED);
             reportRaw.setType(Type.valueOf(type));
-
-            checkAccessibility(accountUrl, paramsRaw.getAccounts());
+reportRaw.setKey(user.getKey());
+reportRaw.setNick(user.getNick());
+            checkAccessibility(accountUrl, paramsRaw.getAccounts(),user.getNick(),user.getKey());
 
             //сохраняет переданные счета
             for (int i = 0; i < paramsRaw.getAccounts().size(); i++) {
@@ -143,7 +144,7 @@ public class ReportService implements IReportService {
                     }
                     Category category = new Category();
 
-                    checkAccessibility(categoryUrl, paramsRaw.getCategory());
+                    checkAccessibility(categoryUrl, paramsRaw.getCategory(),null,null);
 
                     //создает ReportUuid, Category, Uuid и сохраняет
                     for (int i = 0; i < paramsRaw.getCategory().size(); i++) {
@@ -320,7 +321,7 @@ public class ReportService implements IReportService {
                     //создание строк с названием счета, балансом, и типом счета
                     for (int i = 0; i < accountEntityList.size(); i++) {
                         UUID uuidAccount = accountEntityList.get(i).getAccount();
-                        Account account = accountObject(uuidAccount);
+                        Account account = accountObject(uuidAccount,report.getNick(),report.getKey());
                         currency = title(account.getCurrency(), currencyUrl);
                         sum = balance.get(uuidAccount);
 
@@ -384,7 +385,7 @@ public class ReportService implements IReportService {
                         int lastRowNum;
                         int firstRowNum;
                         UUID uuidAccount = accountEntityList.get(i).getAccount();
-                        Account account = accountObject(uuidAccount);
+                        Account account = accountObject(uuidAccount,report.getNick(),report.getKey());
                         operationList = operationMap.get(uuidAccount);
                         currency = title(account.getCurrency(), currencyUrl);
 
@@ -565,7 +566,7 @@ public class ReportService implements IReportService {
                         //получает счет и сохраняет его баланс
                         for (int j = 0; j < accountList.size(); j++) {
                             UUID uuid = accountList.get(j).getAccount();
-                            Account account = accountObject(uuid);
+                            Account account = accountObject(uuid,report.getNick(),report.getKey());
                             balance.put(uuid, account.getBalance());
                         }
 
@@ -662,9 +663,9 @@ public class ReportService implements IReportService {
     }
 
     //получает счет по ключу
-    private Account accountObject(UUID uuid) {
+    private Account accountObject(UUID uuid,String nick,String key) {
         Account account;
-        try (InputStream stream = new URL(accountUrl + uuid).openStream();
+        try (InputStream stream = new URL(accountUrl + uuid+"/"+nick+"/"+key).openStream();
              BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
 
             String accountStr = reader.lines().collect(Collectors.joining("\n"));
@@ -700,15 +701,30 @@ public class ReportService implements IReportService {
         for (int j = 0; j < accountList.size(); j++) {
             String uuid = String.valueOf(accountList.get(j).getAccount());
             //получает операции счета
-            try (InputStream stream = new URL(operationUrl + uuid + "/operation").openStream()) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
-                String operationStr = reader.lines().collect(Collectors.joining("\n"));
-                objectMapper.registerModule(new JavaTimeModule());
-                operations = objectMapper.readValue(operationStr, new TypeReference<List<Operation>>() {
-                });
-            } catch (IOException e) {
-                throw new ValidationException(MessageError.UUID_OPERATION);
-            }
+            User user = new User();
+            user.setKey(report.getKey());
+            user.setNick(report.getNick());
+
+try {
+
+    String jsonUser = objectMapper.writeValueAsString(user);
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    HttpEntity<String> str = new HttpEntity<>(jsonUser, headers);
+    ResponseEntity<List> response = restTemplate.postForEntity(operationUrl + uuid + "/operation", str,List.class     );
+operations =  operations = objectMapper.convertValue(response.getBody(), new TypeReference<List<Operation>>() {});
+}catch (IOException e) {
+    throw new ValidationException(MessageError.UUID_OPERATION);
+}
+//    try (InputStream stream = new URL(operationUrl + uuid + "/operation").openStream()) {
+//        BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
+//        String operationStr = reader.lines().collect(Collectors.joining("\n"));
+//        objectMapper.registerModule(new JavaTimeModule());
+//        operations = objectMapper.readValue(operationStr, new TypeReference<List<Operation>>() {
+//        });
+//    } catch (IOException e) {
+//        throw new ValidationException(MessageError.UUID_OPERATION);
+//    }
             //сортировка по дате
             for (int e = operations.size() - 1; e >= 0; e--) {
                 if (operations.get(e).getDate().isBefore(report.getFromDate()) || operations.get(e).getDate().isAfter(report.getToDate())) {
@@ -767,11 +783,14 @@ public class ReportService implements IReportService {
     }
 
     //проверят доступность
-    private void checkAccessibility(String url, List<UUID> uuidList) {
+    private void checkAccessibility(String url, List<UUID> uuidList,String nick,String key) {
         for (int i = 0; i < uuidList.size(); i++) {
-            try (InputStream stream = new URL(url + uuidList.get(i).toString()).openStream()) {
+            String uuid = String.valueOf(uuidList.get(i));
+            try (InputStream stream = new URL(url + uuid+"/"+nick+"/"+key).openStream()) {
+                //получает валюту
                 BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
-                String str = reader.lines().collect(Collectors.joining("\n"));
+                String currency = reader.lines().collect(Collectors.joining("\n"));
+
             } catch (IOException e) {
 
                 throw new ValidationException(MessageError.INCORRECT_UUID);
